@@ -1,0 +1,21 @@
+{
+  "TotalSpots": 100,
+  "Vehicles": [
+    {
+      "Type": "Car",
+      "RequiredSpots": 1
+    },
+    {
+      "Type": "MotorCycle",
+      "RequiredSpots": 2
+    },
+    {
+      "Type": "Bus",
+      "RequiredSpots": 0.5
+    },
+    {
+      "Type": "Bicycle",
+      "RequiredSpots": 4
+    }
+  ]
+}
