@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System;
 using Spectre.Console;
 using ParkingSystem.Classes_Folder;
+using System.Text.Json.Serialization;
 
 namespace MainApp
 {
@@ -16,6 +17,8 @@ namespace MainApp
         {
             // konfiguration och parkeringsdata
             Config config = LoadConfigData();
+
+            var parkedVehicles = LoadParkedVehicleData();
             var parkingGarage1 = new ParkingGarage(config.ParkingConfig.TotalSpots); // Initialize with current TotalSpots
             var parkingGarage = new string[config.ParkingConfig.TotalSpots];// LoadParkingData();
 
@@ -465,6 +468,20 @@ namespace MainApp
               string jsonString = File.ReadAllText(jsonFilePath);
             // Deserialize the JSON data to Config object
             return JsonSerializer.Deserialize<Config>(jsonString);
+        }
+
+        static ParkedDataConfig LoadParkedVehicleData()
+        {
+            // Use a relative path to read the JSON file
+            string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ParkedDataConfig.json");
+            string jsonString = File.ReadAllText(jsonFilePath);
+            // Deserialize the JSON data to Config object
+            var options = new JsonSerializerOptions
+            {
+                Converters = { new JsonStringEnumConverter() },
+                AllowTrailingCommas = true
+            };
+            return JsonSerializer.Deserialize<ParkedDataConfig>(jsonString, options);
         }
 
 
