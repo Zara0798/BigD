@@ -8,10 +8,19 @@ public abstract class Vehicle
 {
     public string LicensePlate { get; set; }
     public abstract double Size { get; } // Abstrakt egenskap
+    //public DateTime Arrival { get; set; } = DateTime.Now;
+    public int PricePerHour { get; set; }
 
-    protected Vehicle(string licensePlate)
+    public Vehicle(string licensePlate)
     {
         LicensePlate = licensePlate;
     }
+
+    // TODO: vi kommer att behöva en ToString() för att skriva ut fordon
+    public override string ToString()
+    {
+        return $"Vehicle: {LicensePlate}";
+    }
+
 }
 

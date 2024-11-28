@@ -17,11 +17,6 @@ namespace ParkingSystem.Classes_Folder
         private List<ParkingSpot> parkingSpots;
         private Dictionary<string, (int spot, DateTime startTime, VehicleType type)> parkedVehicles;
 
-
-        //Sedan får ParkingLot ha en konstruktor som ropar på en metod som initialiserar P-huset,
-        //läser in konfig-fil och data-fil osv.
-        //Där är ni på god väg att få det rätt.
-        //Däremot förstår jag inte riktigt varför ni har en separat ParkingManager.
         public ParkingLot(int totalSpots)
         {
             parkingSpots = new List<ParkingSpot>(totalSpots);

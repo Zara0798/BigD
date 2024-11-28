@@ -9,45 +9,15 @@ namespace ParkingSystem.Classes_Folder
         public bool IsOccupied => OccupiedSize >= Capacity;
         private double OccupiedSize = 0;
         private DateTime? ParkedTime = null;
+        public List<Vehicle> ParkedVehicles { get; set; }
+
 
         public ParkingSpot(int spotNumber)
         {
             SpotNumber = spotNumber;
+            Capacity = 1; //TODO: skall komma från konfigfil
+            //ParkedVehicles = new List<Vehicle>();
         }
-
-        //public enum VehicleType
-        //{
-        //    Car,
-        //    Motorcycle,
-        //    Bus,
-        //    Bicycle,
-        //    Helicopter
-        //}
-
-        
-        //public class Vehicle
-        //{
-        //    public string LicensePlate { get; set; }
-        //    public VehicleType Type { get; set; }
-
-        //    public Vehicle(string licensePlate, VehicleType type)
-        //    {
-        //        LicensePlate = licensePlate;
-        //        Type = type;
-        //    }
-        //}
-
-        //public bool ParkVehicle(Vehicle vehicle)
-        //{
-        //    double vehicleSize = GetVehicleSize(vehicle.Type);
-        //    if (OccupiedSize + vehicleSize <= Capacity)
-        //    {
-        //        OccupiedSize += vehicleSize;
-        //        ParkedTime = DateTime.Now;
-        //        return true;
-        //    }
-        //    return false;
-        //}
 
         public void ClearSpot()
         {

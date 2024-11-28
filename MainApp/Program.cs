@@ -15,12 +15,12 @@ namespace MainApp
         static void Main()
         {
             // konfiguration och parkeringsdata
-            ConfigData config = LoadConfigData();
-            var parkingGarage1 = new ParkingGarage(config.TotalSpots); // Initialize with current TotalSpots
-            var parkingGarage = new string[config.TotalSpots];// LoadParkingData();
+            Config config = LoadConfigData();
+            var parkingGarage1 = new ParkingGarage(config.ParkingConfig.TotalSpots); // Initialize with current TotalSpots
+            var parkingGarage = new string[config.ParkingConfig.TotalSpots];// LoadParkingData();
 
             // Exempel på att öka TotalSpots
-            config.IncreaseTotalSpots(20); // Öka TotalSpots med 20 platser
+            config.ParkingConfig.IncreaseTotalSpots(20); // Öka TotalSpots med 20 platser
 
             while (true)
             {
@@ -95,7 +95,7 @@ namespace MainApp
         class ConfigData
         {
             public int TotalSpots { get; set; }
-            public int VIPSpots { get; set; }
+            //public int VIPSpots { get; set; }
             public List<Vehicle> Vehicles { get; set; }
 
             public void IncreaseTotalSpots(int additionalSpots)
@@ -458,13 +458,13 @@ namespace MainApp
             return Enumerable.Repeat(string.Empty, config.TotalSpots).ToArray();
         }
 
-        static ConfigData LoadConfigData()
+        static Config LoadConfigData()
         {
             // Use a relative path to read the JSON file
             string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json"); 
               string jsonString = File.ReadAllText(jsonFilePath);
             // Deserialize the JSON data to Config object
-            return JsonSerializer.Deserialize<ConfigData>(jsonString);
+            return JsonSerializer.Deserialize<Config>(jsonString);
         }
 
 

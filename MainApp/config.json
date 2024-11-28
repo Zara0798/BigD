@@ -1,21 +1,35 @@
 {
-  "TotalSpots": 100,
-  "Vehicles": [
-    {
-      "Type": "Car",
-      "RequiredSpots": 1
-    },
-    {
-      "Type": "MotorCycle",
-      "RequiredSpots": 2
-    },
-    {
-      "Type": "Bus",
-      "RequiredSpots": 0.5
-    },
-    {
-      "Type": "Bicycle",
-      "RequiredSpots": 4
+  "ParkingConfig": {
+    "TotalSpots": 100,
+    "VehicleTypes": [
+      "Car",
+      "MotorCycle",
+      "Bus",
+      "Bicycle"
+    ],
+    "VehiclesPerSpot": {
+      "Car": 1,
+      "MotorCycle": 2,
+      "Bus": 5,
+      "Bicycle": 10
     }
-  ]
+  },
+    "PriceList": [
+      {
+        "VehicleType": "Car",
+        "Price": 20
+      },
+      {
+        "VehicleType": "MotorCycle",
+        "Price": 10
+      },
+      {
+        "VehicleType": "Bus",
+        "Price": 50
+      },
+      {
+        "VehicleType": "Bicycle",
+        "Price": 5
+      }
+    ]
 }

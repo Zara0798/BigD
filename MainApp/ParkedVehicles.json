@@ -1,0 +1,24 @@
+{
+  "parkedVehicles": {
+    "ABC123": {
+      "spot": 1,
+      "startTime": "2024-11-28T22:39:00",
+      "type": "Car"
+    },
+    "XYZ789": {
+      "spot": 2,
+      "startTime": "2024-11-28T21:30:00",
+      "type": "MotorCycle"
+    },
+    "LMN456": {
+      "spot": 3,
+      "startTime": "2024-11-28T20:15:00",
+      "type": "Bus"
+    },
+    "JKL321": {
+      "spot": 4,
+      "startTime": "2024-11-28T19:45:00",
+      "type": "Bicycle"
+    }
+  }
+}
