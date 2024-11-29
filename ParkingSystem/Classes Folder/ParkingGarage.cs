@@ -290,38 +290,6 @@ namespace ParkingSystem.Classes_Folder
             return (false, null); // Vehicle not found
         }
 
-
-        /* TODO: P-huset behöver publika metoder för:
-         * Parkera ett fordon
-         * Hämta ut ett fordon
-         * Flytta ett fordon
-         * Söka efter fordon (regnummer)
-         * Visa hela husets innehåll
-         * 
-         * Vi behöver även några privata hjälpmetoder:
-         * Hitta ledig plats för ett fordon
-         * Skapa ett fordon
-         * Ta fram ett fordon, givet ett regnummer (variant på sökning)
-         */
-
-        //static void ClearParkingGarage(string[] garage)
-        //{
-        //    Console.Write("Enter admin password to clear the parking garage: ");
-        //    string? password = Console.ReadLine();
-
-        //    if (password == AdminPassword)
-        //    {
-        //        Array.Clear(garage, 0, garage.Length);
-        //        parkingTimes.Clear();
-        //        Console.WriteLine("Parking garage has been cleared.");
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Incorrect password. Access denied.");
-        //    }
-        //}
-
-
         public void ClearParkingGarage()
         {
             foreach (var spot in Garage)

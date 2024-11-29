@@ -347,7 +347,7 @@ ______                            ______          _    _                      __
         }
 
 
-            static void ParkVehicle(ParkingGarage garage)
+        static void ParkVehicle(ParkingGarage garage)
         {
             Console.Write("Enter vehicle type (Car, Motorcycle, Bus, Bicycle, Helicopter): ");
             string? vehicleTypeInput = Console.ReadLine();
