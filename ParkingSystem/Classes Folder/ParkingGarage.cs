@@ -241,6 +241,26 @@ namespace ParkingSystem.Classes_Folder
         }
 
 
+        public ParkedVehicleInfo? SearchVehicleByLicensePlate(string licensePlate)
+        {
+            foreach (var spot in Garage)
+            {
+                var vehicle = spot.ParkedVehicles.FirstOrDefault(v => v.LicensePlate == licensePlate);
+                if (vehicle != null)
+                {
+                    return new ParkedVehicleInfo
+                    {
+                        SpotNumber = spot.SpotNumber,
+                        Status = spot.IsOccupied ? "Occupied" : "Empty",
+                        LicensePlate = vehicle.LicensePlate,
+                        ParkingTime = CalculateParkingTime(vehicle.StartTime, vehicle.EndTime).DurationInMins,
+                        CurrentFee = CalculateParkingFee(CalculateParkingTime(vehicle.StartTime, vehicle.EndTime).DurationInMins, vehicle)
+                    };
+                }
+            }
+            return null; // Vehicle not found
+        }
+
 
         // Söka efter fordon (regnummer)
         //public bool RetrieveVehicle(string licensePlate)
@@ -422,45 +442,6 @@ namespace ParkingSystem.Classes_Folder
         //    Console.WriteLine($"Vehicle moved from spot {currentSpot + 1} to spot {availableSpot + 1}.");
         //}
 
-        //static void SearchVehicle(string[] garage)
-        //{
-        //    Console.Write("Enter license plate to search: ");
-        //    string? licensePlate = Console.ReadLine();
 
-        //    if (string.IsNullOrEmpty(licensePlate))
-        //    {
-        //        Console.WriteLine("License plate cannot be empty.");
-        //        return;
-        //    }
-
-        //    // hitta fordonet
-        //    int vehicleSpot = Array.FindIndex(garage, spot => spot?.Contains($"#{licensePlate}") == true);
-
-        //    if (vehicleSpot == -1)
-        //    {
-        //        Console.WriteLine("Vehicle not found.");
-        //        return;
-        //    }
-
-        //    // visa fordonsinformation
-        //    string[] vehicleData = garage[vehicleSpot].Split('#');
-        //    string vehicleType = vehicleData[0];
-
-        //    if (parkingTimes.TryGetValue(licensePlate, out DateTime startTime))
-        //    {
-        //        TimeSpan duration = DateTime.Now - startTime;
-        //        int fee = CalculateParkingCost(duration, vehicleType);
-
-        //        Console.WriteLine($"Vehicle found in spot {vehicleSpot + 1}.");
-        //        Console.WriteLine($"Vehicle Type: {vehicleType}");
-        //        Console.WriteLine($"License Plate: {licensePlate}");
-        //        Console.WriteLine($"Parking Duration: {duration.Hours}h {duration.Minutes}m");
-        //        Console.WriteLine($"Current Fee: {fee} CZK");
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Error: Parking time not found.");
-        //    }
-        //}
     }
 }
