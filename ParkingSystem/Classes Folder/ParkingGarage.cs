@@ -62,7 +62,7 @@ namespace ParkingSystem.Classes_Folder
             }
         }
 
-        private Vehicle CreateVehicle(string licensePlate, VehicleType type)
+        public Vehicle CreateVehicle(string licensePlate, VehicleType type)
         {
             return type switch
             {
@@ -87,7 +87,7 @@ namespace ParkingSystem.Classes_Folder
         //    };
         //}
 
-        private int GetVehiclePricePerHour(VehicleType type)
+        public int GetVehiclePricePerHour(VehicleType type)
         {
             return type switch
             {
@@ -251,67 +251,6 @@ namespace ParkingSystem.Classes_Folder
         //    };
         //}
 
-        //static void ParkVehicle(string[] garage)
-        //{
-        //    Console.Write("Enter vehicle type: ");
-        //    string? vehicleType = Console.ReadLine();
-
-        //    if (string.IsNullOrEmpty(vehicleType))
-        //    {
-        //        Console.WriteLine("Vehicle type cannot be empty.");
-        //        return;
-        //    }
-
-        //    Console.Write("Enter license plate: ");
-        //    string? licensePlate = Console.ReadLine();
-
-        //    if (string.IsNullOrEmpty(licensePlate))
-        //    {
-        //        Console.WriteLine("License plate cannot be empty.");
-        //        return;
-        //    }
-
-        //    // kontrollerar om fordon redan är parkerat
-        //    if (parkingTimes.ContainsKey(licensePlate))
-        //    {
-        //        Console.WriteLine("This vehicle is already parked.");
-        //        return;
-        //    }
-
-        //    double requiredSpots = GetRequiredSpots(vehicleType);
-
-        //    // skriv ut nuvarande status för garaget
-        //    Console.WriteLine("Current state of the garage:");
-        //    for (int i = 0; i < garage.Length; i++)
-        //    {
-        //        Console.WriteLine($"Spot {i + 1}: {garage[i]}");
-        //    }
-
-        //    // tillgängliga platser
-        //    int availableSpot = FindAvailableSpots(garage, requiredSpots);
-
-        //    if (availableSpot == -1)
-        //    {
-        //        Console.WriteLine("No available spots.");
-        //        return;
-        //    }
-
-        //    // parkera fordonet
-        //    for (int i = 0; i < (int)Math.Ceiling(requiredSpots); i++)
-        //    {
-        //        garage[availableSpot + i] = $"{vehicleType}#{licensePlate}";
-        //    }
-        //    parkingTimes[licensePlate] = DateTime.Now;
-
-        //    Console.WriteLine($"Vehicle parked in spots {availableSpot + 1} to {availableSpot + (int)Math.Ceiling(requiredSpots)}.");
-
-        //    // uppdaterad lägesstatus
-        //    Console.WriteLine("Updated state of the garage:");
-        //    for (int i = 0; i < garage.Length; i++)
-        //    {
-        //        Console.WriteLine($"Spot {i + 1}: {garage[i]}");
-        //    }
-        //}
 
         //static int FindAvailableSpots(string[] garage, double requiredSpots)
         //{
