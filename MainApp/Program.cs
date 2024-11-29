@@ -79,7 +79,7 @@ namespace MainApp
                         Console.WriteLine("Configuration file has been reloaded.");
                         break;
                     case "7":
-                       // ClearParkingGarage(parkingGarage);
+                        ClearParkingGarage(parkingGarage);
                         break;
                     case "8":
                         SaveParkingData(parkingGarage);
@@ -145,6 +145,24 @@ namespace MainApp
 
             Console.WriteLine("Parking data has been saved to ParkedDataConfig.json.");
         }
+
+
+        static void ClearParkingGarage(ParkingGarage garage)
+        {
+            Console.Write("Enter admin password to clear the parking garage: ");
+            string? password = Console.ReadLine();
+
+            if (password == AdminPassword)
+            {
+                garage.ClearParkingGarage();
+                Console.WriteLine("Parking garage has been cleared.");
+            }
+            else
+            {
+                Console.WriteLine("Incorrect password. Access denied.");
+            }
+        }
+
 
         static void RetrieveVehicle(ParkingGarage garage)
         {
