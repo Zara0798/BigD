@@ -3,6 +3,7 @@ using ParkingSystem.Classes_Folder;
 using System.Text.Json;
 using System.IO;
 using ParkingSystem.Enums;
+using System.Text;
 
 namespace ParkingSystem.Classes_Folder
 {
@@ -10,25 +11,17 @@ namespace ParkingSystem.Classes_Folder
 
     public class ParkingGarage
     {
-        // TODO: Vi behöver läsa in konfiguration från fil och spara här i något lämpligt objekt
         public Config config;
+        public ParkedDataConfig parkedDataConfig;
         public List<ParkingSpot> Garage { get; set; }
 
-        //private Dictionary<string, (int spot, DateTime startTime, VehicleType type)> parkedVehicles;
 
-        //Sedan får parkingGarage ha en konstruktor som ropar på en metod som initialiserar P-huset,
-        //läser in konfig-fil och data-fil osv.
-        //Där är ni på god väg att få det rätt.
-        //Däremot förstår jag inte riktigt varför ni har en separat ParkingManager.
-
- 
-
-        //public ParkingGarage(ParkingLot parkingLot, ConfigData config)
-        //{
-        //    this.parkingLot = parkingLot ?? throw new ArgumentNullException(nameof(parkingLot));
-        //    this.config = config ?? throw new ArgumentNullException(nameof(config));
-        //    InitializeGarage();
-        //}
+        public ParkingGarage(Config parkingConfig, ParkedDataConfig parkedDataConfig)
+        {
+            this.config = parkingConfig ?? throw new ArgumentNullException(nameof(parkingConfig));
+            this.parkedDataConfig = parkedDataConfig ?? throw new ArgumentNullException(nameof(parkedDataConfig));
+            InitializeGarage();
+        }
 
         public ParkingGarage(int totalSpots)
         {
@@ -43,14 +36,153 @@ namespace ParkingSystem.Classes_Folder
 
         private void InitializeGarage()
         {
-            
+            Garage = new List<ParkingSpot>(config.ParkingConfig.TotalSpots);
+            for (int i = 0; i < config.ParkingConfig.TotalSpots; i++)
+            {
+                Garage.Add(new ParkingSpot(i + 1));
+            }
+
+            foreach (var kvp in parkedDataConfig.ParkedVehicles)
+            {
+                string licensePlate = kvp.Key;
+                ParkedVehicle parkedVehicle = kvp.Value;
+
+                // Find the corresponding parking spot
+                ParkingSpot spot = Garage.FirstOrDefault(s => s.SpotNumber == parkedVehicle.Spot);
+                if (spot != null)
+                {
+                    spot.Capacity = spot.GetVehicleSize(parkedVehicle.Type);
+                    // Create a specific type of vehicle based on VehicleType
+                    Vehicle vehicle = CreateVehicle(licensePlate, parkedVehicle.Type);
+                    vehicle.PricePerHour = GetVehiclePricePerHour(parkedVehicle.Type);
+                    spot.ParkedVehicles.Add(vehicle);
+                    spot.OccupiedSize = spot.GetVehicleSize(parkedVehicle.Type);
+ 
+                }
+            }
         }
 
+        private Vehicle CreateVehicle(string licensePlate, VehicleType type)
+        {
+            return type switch
+            {
+                VehicleType.Car => new Car(licensePlate),
+                VehicleType.Motorcycle => new Motorcycle(licensePlate),
+                VehicleType.Bus => new Bus(licensePlate),
+                VehicleType.Helicopter => new Helicopter(licensePlate),
+                _ => throw new ArgumentException("Invalid vehicle type", nameof(type)),
+            };
+        }
+
+        //private double GetVehicleSize(VehicleType type)
+        //{
+        //    return type switch
+        //    {
+        //        VehicleType.Car => 1.0,
+        //        VehicleType.Motorcycle => 0.5,
+        //        VehicleType.Bus => 3.0,
+        //        VehicleType.Bicycle => 0.2,
+        //        VehicleType.Helicopter => 5.0,
+        //        _ => throw new ArgumentOutOfRangeException(nameof(type), $"Not expected vehicle type value: {type}")
+        //    };
+        //}
+
+        private int GetVehiclePricePerHour(VehicleType type)
+        {
+            return type switch
+            {
+                VehicleType.Car => 10,
+                VehicleType.Motorcycle => 5,
+                VehicleType.Bus => 20,
+                VehicleType.Bicycle => 2,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), $"Not expected vehicle type value: {type}")
+            };
+        }
         public void SaveParkingDataToFile(string filePath)
         {
-            
+            throw new NotImplementedException();
         }
 
+
+        public class ParkedVehicleInfo
+        {
+            public int SpotNumber { get; set; }
+            public string Status { get; set; }
+            public string LicensePlate { get; set; }
+            public DateTime? ParkingTime { get; set; }
+            public int CurrentFee { get; set; }
+        }
+
+        public List<ParkedVehicleInfo> GetParkedVehiclesInfo()
+        {
+            var parkedVehiclesInfo = new List<ParkedVehicleInfo>();
+
+            foreach (var spot in Garage)
+            {
+                if (spot.ParkedVehicles != null && spot.ParkedVehicles.Count > 0)
+                {
+                    foreach (var vehicle in spot.ParkedVehicles)
+                    {
+                        var info = new ParkedVehicleInfo
+                        {
+                            SpotNumber = spot.SpotNumber,
+                            Status = spot.IsOccupied ? "Occupied" : "Empty",
+                            LicensePlate = vehicle.LicensePlate,
+                            ParkingTime = spot.ParkedTime,
+                            CurrentFee = CalculateParkingFee(spot.ParkedTime, vehicle)
+                        };
+                        parkedVehiclesInfo.Add(info);
+                    }
+                }
+            }
+
+            return parkedVehiclesInfo;
+        }
+
+
+        public class ParkingSpotInfo
+        {
+            public int SpotNumber { get; set; }
+            public string Status { get; set; }
+            public string LicensePlate { get; set; }
+        }
+
+        public List<ParkingSpotInfo> GetParkingMapInfo()
+        {
+            var parkingMapInfo = new List<ParkingSpotInfo>();
+
+            foreach (var spot in Garage)
+            {
+                if (spot == null) continue; // Add this line to skip null spots
+
+                var info = new ParkingSpotInfo
+                {
+                    SpotNumber = spot.SpotNumber,
+                    Status = spot.IsOccupied ? "Occupied" : "Empty",
+                    LicensePlate = spot.ParkedVehicles.Count > 0 ? spot.ParkedVehicles[0].LicensePlate : "-"
+                };
+                parkingMapInfo.Add(info);
+            }
+
+            return parkingMapInfo;
+        }
+
+        private int CalculateParkingFee(DateTime? parkedTime, Vehicle vehicle)
+        {
+            if (!parkedTime.HasValue)
+            {
+                return 0;
+            }
+
+            TimeSpan duration = DateTime.Now - parkedTime.Value;
+            if (duration.TotalMinutes <= 10)
+            {
+                return 0;
+            }
+
+            duration = duration.Subtract(TimeSpan.FromMinutes(10));
+            return (int)(duration.TotalMinutes * vehicle.PricePerHour);
+        }
 
         // Söka efter fordon (regnummer)
         //public bool RetrieveVehicle(string licensePlate)
@@ -88,5 +220,250 @@ namespace ParkingSystem.Classes_Folder
          * Skapa ett fordon
          * Ta fram ett fordon, givet ett regnummer (variant på sökning)
          */
+
+        //static void ClearParkingGarage(string[] garage)
+        //{
+        //    Console.Write("Enter admin password to clear the parking garage: ");
+        //    string? password = Console.ReadLine();
+
+        //    if (password == AdminPassword)
+        //    {
+        //        Array.Clear(garage, 0, garage.Length);
+        //        parkingTimes.Clear();
+        //        Console.WriteLine("Parking garage has been cleared.");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Incorrect password. Access denied.");
+        //    }
+        //}
+
+        //static double GetRequiredSpots(string vehicleType)
+        //{
+        //    return vehicleType.ToLower() switch
+        //    {
+        //        "car" => 1,
+        //        "motorcycle" => 0.5,
+        //        "bus" => 3,
+        //        "helicopter" => 5,
+        //        "bike" => 0.2,
+        //        _ => 1 // standard för 1 parkeringsplats
+        //    };
+        //}
+
+        //static void ParkVehicle(string[] garage)
+        //{
+        //    Console.Write("Enter vehicle type: ");
+        //    string? vehicleType = Console.ReadLine();
+
+        //    if (string.IsNullOrEmpty(vehicleType))
+        //    {
+        //        Console.WriteLine("Vehicle type cannot be empty.");
+        //        return;
+        //    }
+
+        //    Console.Write("Enter license plate: ");
+        //    string? licensePlate = Console.ReadLine();
+
+        //    if (string.IsNullOrEmpty(licensePlate))
+        //    {
+        //        Console.WriteLine("License plate cannot be empty.");
+        //        return;
+        //    }
+
+        //    // kontrollerar om fordon redan är parkerat
+        //    if (parkingTimes.ContainsKey(licensePlate))
+        //    {
+        //        Console.WriteLine("This vehicle is already parked.");
+        //        return;
+        //    }
+
+        //    double requiredSpots = GetRequiredSpots(vehicleType);
+
+        //    // skriv ut nuvarande status för garaget
+        //    Console.WriteLine("Current state of the garage:");
+        //    for (int i = 0; i < garage.Length; i++)
+        //    {
+        //        Console.WriteLine($"Spot {i + 1}: {garage[i]}");
+        //    }
+
+        //    // tillgängliga platser
+        //    int availableSpot = FindAvailableSpots(garage, requiredSpots);
+
+        //    if (availableSpot == -1)
+        //    {
+        //        Console.WriteLine("No available spots.");
+        //        return;
+        //    }
+
+        //    // parkera fordonet
+        //    for (int i = 0; i < (int)Math.Ceiling(requiredSpots); i++)
+        //    {
+        //        garage[availableSpot + i] = $"{vehicleType}#{licensePlate}";
+        //    }
+        //    parkingTimes[licensePlate] = DateTime.Now;
+
+        //    Console.WriteLine($"Vehicle parked in spots {availableSpot + 1} to {availableSpot + (int)Math.Ceiling(requiredSpots)}.");
+
+        //    // uppdaterad lägesstatus
+        //    Console.WriteLine("Updated state of the garage:");
+        //    for (int i = 0; i < garage.Length; i++)
+        //    {
+        //        Console.WriteLine($"Spot {i + 1}: {garage[i]}");
+        //    }
+        //}
+
+        //static int FindAvailableSpots(string[] garage, double requiredSpots)
+        //{
+        //    int intRequiredSpots = (int)Math.Ceiling(requiredSpots);
+
+        //    for (int i = 0; i <= garage.Length - intRequiredSpots; i++)
+        //    {
+        //        bool allSpotsAvailable = true;
+        //        for (int j = 0; j < intRequiredSpots; j++)
+        //        {
+        //            if (!string.IsNullOrEmpty(garage[i + j]))
+        //            {
+        //                allSpotsAvailable = false;
+        //                break;
+        //            }
+        //        }
+        //        if (allSpotsAvailable)
+        //        {
+        //            Console.WriteLine($"Available spot found at index {i} for {intRequiredSpots} spots.");
+        //            return i;
+        //        }
+        //    }
+        //    Console.WriteLine("No available spots found.");
+        //    return -1;
+        //}
+
+        //static void RetrieveVehicle(string[] garage)
+        //{
+        //    Console.Write("Enter license plate: ");
+        //    string? licensePlate = Console.ReadLine();
+
+        //    if (string.IsNullOrEmpty(licensePlate))
+        //    {
+        //        Console.WriteLine("License plate cannot be empty.");
+        //        return;
+        //    }
+
+        //    // Hitta fordon
+        //    int vehicleSpot = Array.FindIndex(garage, spot => spot?.Contains($"#{licensePlate}") == true);
+
+        //    if (vehicleSpot == -1)
+        //    {
+        //        Console.WriteLine("Vehicle not found.");
+        //        return;
+        //    }
+
+        //    // logga nuvarande parkeringstider
+        //    Console.WriteLine("Current parking times:");
+        //    foreach (var entry in parkingTimes)
+        //    {
+        //        Console.WriteLine($"License Plate: {entry.Key}, Start Time: {entry.Value}");
+        //    }
+
+        //    // räkna parkerings avgift
+        //    string[] vehicleData = garage[vehicleSpot].Split('#');
+        //    string vehicleType = vehicleData[0];
+
+        //    if (parkingTimes.TryGetValue(licensePlate, out DateTime startTime))
+        //    {
+        //        TimeSpan duration = DateTime.Now - startTime;
+        //        int fee = CalculateParkingCost(duration, vehicleType);
+
+        //        // ta bort fordonet
+        //        for (int i = 0; i < (int)Math.Ceiling(GetRequiredSpots(vehicleType)); i++)
+        //        {
+        //            garage[vehicleSpot + i] = string.Empty;
+        //        }
+        //        parkingTimes.Remove(licensePlate);
+
+        //        Console.WriteLine($"Vehicle retrieved from spot {vehicleSpot + 1}. Parking fee: {fee} CZK.");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Error: Parking time not found.");
+        //    }
+        //}
+
+        //static void MoveVehicle(string[] garage)
+        //{
+        //    Console.Write("Enter license plate of the vehicle to move: ");
+        //    string? licensePlate = Console.ReadLine();
+
+        //    if (string.IsNullOrEmpty(licensePlate))
+        //    {
+        //        Console.WriteLine("License plate cannot be empty.");
+        //        return;
+        //    }
+
+        //    // hitta fordonet
+        //    int currentSpot = Array.FindIndex(garage, spot => spot?.Contains($"#{licensePlate}") == true);
+
+        //    if (currentSpot == -1)
+        //    {
+        //        Console.WriteLine("Vehicle not found.");
+        //        return;
+        //    }
+
+        //    // hitta tillgänglig plats
+        //    int availableSpot = Array.FindIndex(garage, spot => string.IsNullOrEmpty(spot));
+
+        //    if (availableSpot == -1)
+        //    {
+        //        Console.WriteLine("No available spots.");
+        //        return;
+        //    }
+
+        //    // flytta fordonet
+        //    garage[availableSpot] = garage[currentSpot];
+        //    garage[currentSpot] = string.Empty;
+
+        //    Console.WriteLine($"Vehicle moved from spot {currentSpot + 1} to spot {availableSpot + 1}.");
+        //}
+
+        //static void SearchVehicle(string[] garage)
+        //{
+        //    Console.Write("Enter license plate to search: ");
+        //    string? licensePlate = Console.ReadLine();
+
+        //    if (string.IsNullOrEmpty(licensePlate))
+        //    {
+        //        Console.WriteLine("License plate cannot be empty.");
+        //        return;
+        //    }
+
+        //    // hitta fordonet
+        //    int vehicleSpot = Array.FindIndex(garage, spot => spot?.Contains($"#{licensePlate}") == true);
+
+        //    if (vehicleSpot == -1)
+        //    {
+        //        Console.WriteLine("Vehicle not found.");
+        //        return;
+        //    }
+
+        //    // visa fordonsinformation
+        //    string[] vehicleData = garage[vehicleSpot].Split('#');
+        //    string vehicleType = vehicleData[0];
+
+        //    if (parkingTimes.TryGetValue(licensePlate, out DateTime startTime))
+        //    {
+        //        TimeSpan duration = DateTime.Now - startTime;
+        //        int fee = CalculateParkingCost(duration, vehicleType);
+
+        //        Console.WriteLine($"Vehicle found in spot {vehicleSpot + 1}.");
+        //        Console.WriteLine($"Vehicle Type: {vehicleType}");
+        //        Console.WriteLine($"License Plate: {licensePlate}");
+        //        Console.WriteLine($"Parking Duration: {duration.Hours}h {duration.Minutes}m");
+        //        Console.WriteLine($"Current Fee: {fee} CZK");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Error: Parking time not found.");
+        //    }
+        //}
     }
 }

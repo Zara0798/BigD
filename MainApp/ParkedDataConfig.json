@@ -14,11 +14,6 @@
       "Spot": 3,
       "StartTime": "2024-11-28T20:15:00",
       "Type": "Bus"
-    },
-    "JKL321": {
-      "Spot": 4,
-      "StartTime": "2024-11-28T19:45:00",
-      "Type": "Bicycle"
     }
   }
 }

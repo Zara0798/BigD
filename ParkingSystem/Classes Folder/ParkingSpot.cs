@@ -1,14 +1,15 @@
-﻿using System;
+﻿using ParkingSystem.Enums;
+using System;
 
 namespace ParkingSystem.Classes_Folder
 {
     public class ParkingSpot
     {
-        public int SpotNumber { get; }
-        public double Capacity { get; private set; } = 1.0; // Default for one car spot
+        public int SpotNumber { get; set; }
+        public double Capacity { get;  set; } = 1.0; // Default for one car spot
         public bool IsOccupied => OccupiedSize >= Capacity;
-        private double OccupiedSize = 0;
-        private DateTime? ParkedTime = null;
+        public double OccupiedSize = 0;
+        public DateTime? ParkedTime = null;
         public List<Vehicle> ParkedVehicles { get; set; }
 
 
@@ -16,7 +17,7 @@ namespace ParkingSystem.Classes_Folder
         {
             SpotNumber = spotNumber;
             Capacity = 1; //TODO: skall komma från konfigfil
-            //ParkedVehicles = new List<Vehicle>();
+            ParkedVehicles = new List<Vehicle>();
         }
 
         public void ClearSpot()
@@ -37,17 +38,18 @@ namespace ParkingSystem.Classes_Folder
             ParkedTime = null;
         }
 
-        //private double GetVehicleSize(VehicleType type)
-        //{
-        //    return type switch
-        //    {
-        //        VehicleType.Car => 1.0,
-        //        VehicleType.Motorcycle => 0.5,
-        //        VehicleType.Bus => 2.0,
-        //        VehicleType.Bicycle => 0.2,
-        //        VehicleType.Helicopter => 5.0,
-        //        _ => 1.0
-        //    };
-        //}
+
+        public double GetVehicleSize(VehicleType type)
+        {
+            return type switch
+            {
+                VehicleType.Car => 1.0,
+                VehicleType.Motorcycle => 0.5,
+                VehicleType.Bus => 2.0,
+                VehicleType.Bicycle => 0.2,
+                VehicleType.Helicopter => 5.0,
+                _ => 1.0
+            };
+        }
     }
 }
