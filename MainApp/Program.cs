@@ -66,7 +66,7 @@ namespace MainApp
                         RetrieveVehicle(parkingGarage);
                         break;
                     case "3":
-                       // MoveVehicle(parkingGarage);
+                        MoveVehicle(parkingGarage);
                         break;
                     case "4":
                         SearchVehicle(parkingGarage);
@@ -300,7 +300,36 @@ ______                            ______          _    _                      __
         }
 
 
-        static void ParkVehicle(ParkingGarage garage)
+        static void MoveVehicle(ParkingGarage garage)
+        {
+            Console.Write("Enter license plate of the vehicle to move: ");
+            string? licensePlate = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(licensePlate))
+            {
+                Console.WriteLine("License plate cannot be empty.");
+                return;
+            }
+
+            Console.Write("Enter new spot number: ");
+            if (!int.TryParse(Console.ReadLine(), out int newSpotNumber))
+            {
+                Console.WriteLine("Invalid spot number.");
+                return;
+            }
+
+            if (garage.MoveVehicle(licensePlate, newSpotNumber))
+            {
+                Console.WriteLine($"Vehicle with license plate {licensePlate} has been moved to spot {newSpotNumber}.");
+            }
+            else
+            {
+                Console.WriteLine("Failed to move the vehicle. Either the vehicle was not found or the new spot is occupied.");
+            }
+        }
+
+
+            static void ParkVehicle(ParkingGarage garage)
         {
             Console.Write("Enter vehicle type (Car, Motorcycle, Bus, Bicycle, Helicopter): ");
             string? vehicleTypeInput = Console.ReadLine();

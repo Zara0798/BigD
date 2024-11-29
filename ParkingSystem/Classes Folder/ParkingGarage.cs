@@ -77,19 +77,6 @@ namespace ParkingSystem.Classes_Folder
             };
         }
 
-        //private double GetVehicleSize(VehicleType type)
-        //{
-        //    return type switch
-        //    {
-        //        VehicleType.Car => 1.0,
-        //        VehicleType.Motorcycle => 0.5,
-        //        VehicleType.Bus => 3.0,
-        //        VehicleType.Bicycle => 0.2,
-        //        VehicleType.Helicopter => 5.0,
-        //        _ => throw new ArgumentOutOfRangeException(nameof(type), $"Not expected vehicle type value: {type}")
-        //    };f
-        //}
-
         public int GetVehiclePricePerHour(VehicleType type)
         {
             return type switch
@@ -207,22 +194,36 @@ namespace ParkingSystem.Classes_Folder
             return parkingMapInfo;
         }
 
-        //private int CalculateParkingFee(DateTime? parkedTime, Vehicle vehicle)
-        //{
-        //    if (!parkedTime.HasValue)
-        //    {
-        //        return 0;
-        //    }
 
-        //    // Calculate the parking time using the existing method
-        //    var parkingTimeInfo = CalculateParkingTime(parkedTime.Value);
+        public bool MoveVehicle(string licensePlate, int newSpotNumber)
+        {
+            foreach (var spot in Garage)
+            {
+                var vehicle = spot.ParkedVehicles.FirstOrDefault(v => v.LicensePlate == licensePlate);
+                if (vehicle != null)
+                {
+                    // Find the new spot
+                    var newSpot = Garage.FirstOrDefault(s => s.SpotNumber == newSpotNumber);
+                    if (newSpot != null && !newSpot.IsOccupied)
+                    {
+                        // Move the vehicle to the new spot
+                        spot.ParkedVehicles.Remove(vehicle);
+                        spot.OccupiedSize = 0;
 
-        //    // Subtract the first 10 minutes (0.1667 hours) as free time
-        //    double chargeableHours = Math.Max(0, parkingTimeInfo.DurationInMins - 0.1667);
+                        newSpot.ParkedVehicles.Add(vehicle);
+                        newSpot.OccupiedSize = vehicle.Size;
 
-        //    // Calculate the fee based on the chargeable hours and the vehicle's price per hour
-        //    return (int)(chargeableHours * vehicle.PricePerHour);
-        //}
+                        return true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("The new spot is either occupied or does not exist.");
+                        return false;
+                    }
+                }
+            }
+            return false; // Vehicle not found
+        }
 
         private int CalculateParkingFee(double? parkedTime, Vehicle vehicle)
         {
