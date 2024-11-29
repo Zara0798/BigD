@@ -82,14 +82,14 @@ namespace MainApp
                        // ClearParkingGarage(parkingGarage);
                         break;
                     case "8":
-                       // SaveParkingData(parkingGarage);
+                        SaveParkingData(parkingGarage);
                         return;
                     default:
                         Console.WriteLine("Invalid option, please try again.");
                         break;
                 }
 
-                //SaveParkingData(parkingGarage);
+                SaveParkingData(parkingGarage);
                 Console.WriteLine("\nPress Enter to continue...");
                 Console.ReadLine();
             }
@@ -117,20 +117,35 @@ namespace MainApp
 
             Console.WriteLine("└──────┴────────────┴───────────────┘");
         }
+        static void SaveParkingData(ParkingGarage garage)
+        {
+            var parkedVehicles = garage.Garage
+                .Where(spot => spot.IsOccupied)
+                .SelectMany(spot => spot.ParkedVehicles.Select(vehicle => new
+                {
+                    LicensePlate = vehicle.LicensePlate,
+                    ParkedVehicle = new ParkedVehicle
+                    {
+                        Spot = spot.SpotNumber,
+                        Type = (VehicleType)Enum.Parse(typeof(VehicleType), vehicle.GetType().Name, true), // Assuming the class name matches the VehicleType enum
+                        ParkedTime = spot.ParkedTime ?? DateTime.Now
+                    }
+                }))
+                .ToDictionary(x => x.LicensePlate, x => x.ParkedVehicle);
 
-      
+            var parkedDataConfig = new ParkedDataConfig
+            {
+                ParkedVehicles = parkedVehicles
+            };
 
-        //static void SaveParkingData(string[] garage)
-        //{
-        //    var parkingData = new
-        //    {
-        //        Garage = garage,
-        //        //ParkingTimes = parkingTimes
-        //    };
+            string json = JsonSerializer.Serialize(parkedDataConfig, new JsonSerializerOptions { WriteIndented = true });
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ParkedDataConfig.json");
+            File.WriteAllText(filePath, json);
 
-        //    string json = JsonSerializer.Serialize(parkingData);
-        //    File.WriteAllText(FilePath, json);
-        //}
+            Console.WriteLine("Parking data has been saved to ParkedDataConfig.json.");
+        }
+
+
 
         static int CalculateParkingCost(TimeSpan duration, string vehicleType)
         {
