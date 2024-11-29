@@ -25,6 +25,8 @@ namespace ParkingSystem.Classes_Folder
         public int Spot { get; set; }
         public DateTime StartTime { get; set; }
         public VehicleType Type { get; set; }
+
+        public DateTime ParkedTime { get; set; }
     }
 
 }
