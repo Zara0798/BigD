@@ -4,19 +4,19 @@
       "Spot": 1,
       "StartTime": "2024-11-28T22:39:00",
       "Type": "Car",
-      "ParkedTime": "2024-11-28T23:39:00"
+      "EndTime": "2024-11-28T23:39:00"
     },
     "XYZ789": {
       "Spot": 2,
       "StartTime": "2024-11-28T21:30:00",
       "Type": "Motorcycle",
-      "ParkedTime": "2024-11-28T22:30:00"
+      "EndTime": "2024-11-28T22:30:00"
     },
     "LMN456": {
       "Spot": 3,
       "StartTime": "2024-11-28T20:15:00",
       "Type": "Bus",
-      "ParkedTime": "2024-11-28T21:15:00"
+      "EndTime": "2024-11-28T21:15:00"
     }
   }
 }

@@ -26,7 +26,7 @@ namespace ParkingSystem.Classes_Folder
         public DateTime StartTime { get; set; }
         public VehicleType Type { get; set; }
 
-        public DateTime ParkedTime { get; set; }
+        public DateTime? EndTime { get; set; }
     }
 
 }

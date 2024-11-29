@@ -128,7 +128,8 @@ namespace MainApp
                     {
                         Spot = spot.SpotNumber,
                         Type = (VehicleType)Enum.Parse(typeof(VehicleType), vehicle.GetType().Name, true), // Assuming the class name matches the VehicleType enum
-                        ParkedTime = spot.ParkedTime ?? DateTime.Now
+                        StartTime = spot.ParkedTime ?? DateTime.Now,
+                        EndTime = null // Assuming the vehicle is still parked
                     }
                 }))
                 .ToDictionary(x => x.LicensePlate, x => x.ParkedVehicle);
@@ -220,46 +221,6 @@ ______                            ______          _    _                      __
             Console.ResetColor();
         }
 
-        //static void DisplayParkedVehicles(ParkingGarage garage)
-        //{
-        //    Console.WriteLine("┌──────┬────────────┬───────────────┬────────────────┬──────────────────┐");
-        //    Console.WriteLine("│ Spot │ Status     │ License Plate │ Parking Time   │ Current Fee (CZK)│");
-        //    Console.WriteLine("├──────┼────────────┼───────────────┼────────────────┼──────────────────┤");
-
-        //    for (int i = 0; i < garage.Garage.Count; i++)
-        //    {
-        //        string status = "Empty";
-        //        string licensePlate = "-";
-        //        string parkingDuration = "-";
-        //        string currentFee = "-";
-
-        //        if (garage.Garage[i].ParkedVehicles.Count != 0)
-        //        {
-        //            string[] vehicleData = garage.Garage[i].ParkedVehicles;
-        //            string vehicleType = garage.Garage[i].ParkedVehicles.;
-        //            string registration = vehicleData[1];
-
-        //            status = "Occupied";
-        //            licensePlate = registration;
-
-        //            if (parkingTimes.TryGetValue(registration, out DateTime startTime))
-        //            {
-        //                TimeSpan duration = DateTime.Now - startTime;
-        //                parkingDuration = $"{duration.Hours}h {duration.Minutes}m";
-        //                currentFee = $"{CalculateParkingCost(duration, vehicleType)} CZK";
-        //            }
-        //        }
-
-        //        // Visa rad med färger baserat på beläggningsstatus
-        //        Console.Write("│ {0,-4} │ ", i + 1);
-        //        Console.ForegroundColor = status == "Occupied" ? ConsoleColor.Red : ConsoleColor.Green;
-        //        Console.Write("{0,-10}", status);
-        //        Console.ResetColor();
-        //        Console.WriteLine(" │ {0,-13} │ {1,-14} │ {2,-16} │", licensePlate, parkingDuration, currentFee);
-        //    }
-        //    Console.WriteLine("└──────┴────────────┴───────────────┴────────────────┴──────────────────┘");
-        //}
-
         static void DisplayParkedVehicles(ParkingGarage garage)
         {
             var parkedVehiclesInfo = garage.GetParkedVehiclesInfo();
@@ -271,11 +232,16 @@ ______                            ______          _    _                      __
             foreach (var info in parkedVehiclesInfo)
             {
                 string parkingTime = info.ParkingTime.HasValue ? info.ParkingTime.Value.ToString("yyyy-MM-dd HH:mm:ss") : "-";
+
+                string parkingDuration = $"{info.ParkingTime.Value}m";
+                var currentFee = $"{info.CurrentFee} CZK";
+
+
                 Console.Write("│ {0,-4} │ ", info.SpotNumber);
                 Console.ForegroundColor = info.Status == "Occupied" ? ConsoleColor.Red : ConsoleColor.Green;
-                Console.Write("{0,-10}", info.Status);
+                Console.Write("{0,-10}", info.Status); 
                 Console.ResetColor();
-                Console.WriteLine(" │ {0,-13} │ {1,-14} │ {2,-16} │", info.LicensePlate, parkingTime, info.CurrentFee);
+                Console.WriteLine(" │ {0,-13} │ {1,-14} │ {2,-16} │", info.LicensePlate, parkingDuration, currentFee);
             }
 
             Console.WriteLine("└──────┴────────────┴───────────────┴────────────────┴──────────────────┘");
@@ -322,13 +288,13 @@ ______                            ______          _    _                      __
             Vehicle vehicle = garage.CreateVehicle(licensePlate, vehicleType);
             vehicle.PricePerHour = garage.GetVehiclePricePerHour(vehicleType);
 
-            availableSpot.ParkedVehicles.Add(vehicle);
-            availableSpot.OccupiedSize = availableSpot.GetVehicleSize(vehicleType);
-            availableSpot.ParkedTime = DateTime.Now;
+            garage.ParkVehicle(garage, vehicle, availableSpot.SpotNumber);
 
             Console.WriteLine($"Vehicle parked in spot {availableSpot.SpotNumber}.");
         }
 
+
+   
     }
 
 }

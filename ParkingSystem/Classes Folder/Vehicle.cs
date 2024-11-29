@@ -8,7 +8,10 @@ public abstract class Vehicle
 {
     public string LicensePlate { get; set; }
     public abstract double Size { get; } // Abstrakt egenskap
-    //public DateTime Arrival { get; set; } = DateTime.Now;
+    public DateTime StartTime { get; set; }
+
+    public DateTime? EndTime { get; set; }
+
     public int PricePerHour { get; set; }
 
     public Vehicle(string licensePlate)

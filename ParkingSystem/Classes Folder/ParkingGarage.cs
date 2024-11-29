@@ -55,6 +55,9 @@ namespace ParkingSystem.Classes_Folder
                     // Create a specific type of vehicle based on VehicleType
                     Vehicle vehicle = CreateVehicle(licensePlate, parkedVehicle.Type);
                     vehicle.PricePerHour = GetVehiclePricePerHour(parkedVehicle.Type);
+                    vehicle.StartTime = parkedVehicle.StartTime; // Assign StartTime from parkedVehicle
+                    vehicle.EndTime = parkedVehicle.EndTime; // Assign EndTime from parkedVehicle if available
+
                     spot.ParkedVehicles.Add(vehicle);
                     spot.OccupiedSize = spot.GetVehicleSize(parkedVehicle.Type);
  
@@ -84,7 +87,7 @@ namespace ParkingSystem.Classes_Folder
         //        VehicleType.Bicycle => 0.2,
         //        VehicleType.Helicopter => 5.0,
         //        _ => throw new ArgumentOutOfRangeException(nameof(type), $"Not expected vehicle type value: {type}")
-        //    };
+        //    };f
         //}
 
         public int GetVehiclePricePerHour(VehicleType type)
@@ -109,7 +112,7 @@ namespace ParkingSystem.Classes_Folder
             public int SpotNumber { get; set; }
             public string Status { get; set; }
             public string LicensePlate { get; set; }
-            public DateTime? ParkingTime { get; set; }
+            public double? ParkingTime { get; set; }
             public int CurrentFee { get; set; }
         }
 
@@ -128,8 +131,8 @@ namespace ParkingSystem.Classes_Folder
                             SpotNumber = spot.SpotNumber,
                             Status = spot.IsOccupied ? "Occupied" : "Empty",
                             LicensePlate = vehicle.LicensePlate,
-                            ParkingTime = spot.ParkedTime,
-                            CurrentFee = CalculateParkingFee(spot.ParkedTime, vehicle)
+                            ParkingTime = (CalculateParkingTime(vehicle.StartTime, vehicle.EndTime).DurationInMins),
+                            CurrentFee = CalculateParkingFee(CalculateParkingTime(vehicle.StartTime, vehicle.EndTime).DurationInMins, vehicle)
                         };
                         parkedVehiclesInfo.Add(info);
                     }
@@ -137,6 +140,43 @@ namespace ParkingSystem.Classes_Folder
             }
 
             return parkedVehiclesInfo;
+        }
+
+
+        public class ParkingTimeInfo
+        {
+            public double DurationInMins { get; set; }
+            public DateTime StartTime { get; set; }
+            public DateTime EndTime { get; set; }
+        }
+
+        static ParkingTimeInfo CalculateParkingTime(DateTime startTime, DateTime? endTime = null)
+        {
+            DateTime effectiveEndTime = endTime ?? DateTime.Now;
+            TimeSpan duration = effectiveEndTime - startTime;
+            return new ParkingTimeInfo
+            {
+                DurationInMins = duration.TotalMinutes, // Change to minutes using TotalHours
+                StartTime = startTime,
+                EndTime = effectiveEndTime
+            };
+        }
+
+        public void ParkVehicle(ParkingGarage garage, Vehicle vehicle, int spotNumber)
+        {
+            // Find the corresponding parking spot
+            ParkingSpot spot = garage.Garage.FirstOrDefault(s => s.SpotNumber == spotNumber);
+            if (spot != null && !spot.IsOccupied)
+            {
+                vehicle.StartTime = DateTime.Now; // Set the current time as StartTime
+                spot.ParkedVehicles.Add(vehicle);
+                spot.OccupiedSize = vehicle.Size;
+                spot.ParkedTime = DateTime.Now; // Set the current time as ParkedTime
+            }
+            else
+            {
+                Console.WriteLine("The spot is either occupied or does not exist.");
+            }
         }
 
 
@@ -167,22 +207,40 @@ namespace ParkingSystem.Classes_Folder
             return parkingMapInfo;
         }
 
-        private int CalculateParkingFee(DateTime? parkedTime, Vehicle vehicle)
+        //private int CalculateParkingFee(DateTime? parkedTime, Vehicle vehicle)
+        //{
+        //    if (!parkedTime.HasValue)
+        //    {
+        //        return 0;
+        //    }
+
+        //    // Calculate the parking time using the existing method
+        //    var parkingTimeInfo = CalculateParkingTime(parkedTime.Value);
+
+        //    // Subtract the first 10 minutes (0.1667 hours) as free time
+        //    double chargeableHours = Math.Max(0, parkingTimeInfo.DurationInMins - 0.1667);
+
+        //    // Calculate the fee based on the chargeable hours and the vehicle's price per hour
+        //    return (int)(chargeableHours * vehicle.PricePerHour);
+        //}
+
+        private int CalculateParkingFee(double? parkedTime, Vehicle vehicle)
         {
             if (!parkedTime.HasValue)
             {
                 return 0;
             }
 
-            TimeSpan duration = DateTime.Now - parkedTime.Value;
-            if (duration.TotalMinutes <= 10)
-            {
-                return 0;
-            }
+            // Subtract the first 10 minutes (10 minutes) as free time
+            double chargeableMinutes = Math.Max(0, parkedTime.Value - 10);
 
-            duration = duration.Subtract(TimeSpan.FromMinutes(10));
-            return (int)(duration.TotalMinutes * vehicle.PricePerHour);
+            // Calculate the fee based on the chargeable minutes and the vehicle's price per hour
+            // Convert price per hour to price per minute
+            double pricePerMinute = vehicle.PricePerHour / 60.0;
+            return (int)(chargeableMinutes * pricePerMinute);
         }
+
+
 
         // Söka efter fordon (regnummer)
         //public bool RetrieveVehicle(string licensePlate)
