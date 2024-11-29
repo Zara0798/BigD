@@ -63,7 +63,7 @@ namespace MainApp
                         ParkVehicle(parkingGarage);
                         break;
                     case "2":
-                        //RetrieveVehicle(parkingGarage);
+                        RetrieveVehicle(parkingGarage);
                         break;
                     case "3":
                        // MoveVehicle(parkingGarage);
@@ -144,6 +144,31 @@ namespace MainApp
             File.WriteAllText(filePath, json);
 
             Console.WriteLine("Parking data has been saved to ParkedDataConfig.json.");
+        }
+
+        static void RetrieveVehicle(ParkingGarage garage)
+        {
+            Console.Write("Enter license plate: ");
+            string? licensePlate = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(licensePlate))
+            {
+                Console.WriteLine("License plate cannot be empty.");
+                return;
+            }
+
+            var (success, vehicleInfo) = garage.RetrieveVehicle(licensePlate);
+            if (success && vehicleInfo != null)
+            {
+                Console.WriteLine($"Vehicle retrieved from spot {vehicleInfo.SpotNumber}.");
+                Console.WriteLine($"License Plate: {vehicleInfo.LicensePlate}");
+                Console.WriteLine($"Parking Time: {vehicleInfo.ParkingTime} minutes");
+                Console.WriteLine($"Parking Fee: {vehicleInfo.CurrentFee} CZK");
+            }
+            else
+            {
+                Console.WriteLine("Vehicle not found.");
+            }
         }
 
 

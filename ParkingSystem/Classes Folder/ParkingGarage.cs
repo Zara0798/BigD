@@ -262,6 +262,36 @@ namespace ParkingSystem.Classes_Folder
         }
 
 
+        public (bool success, ParkedVehicleInfo? vehicleInfo) RetrieveVehicle(string licensePlate)
+        {
+            foreach (var spot in Garage)
+            {
+                var vehicle = spot.ParkedVehicles.FirstOrDefault(v => v.LicensePlate == licensePlate);
+                if (vehicle != null)
+                {
+                    var parkingTimeInfo = CalculateParkingTime(vehicle.StartTime, DateTime.Now);
+                    var fee = CalculateParkingFee(parkingTimeInfo.DurationInMins, vehicle);
+
+                    var vehicleInfo = new ParkedVehicleInfo
+                    {
+                        SpotNumber = spot.SpotNumber,
+                        Status = "Retrieved",
+                        LicensePlate = vehicle.LicensePlate,
+                        ParkingTime = parkingTimeInfo.DurationInMins,
+                        CurrentFee = fee
+                    };
+
+                    spot.ParkedVehicles.Remove(vehicle);
+                    spot.OccupiedSize = 0;
+
+                    return (true, vehicleInfo);
+                }
+            }
+            return (false, null); // Vehicle not found
+        }
+
+
+
         // Söka efter fordon (regnummer)
         //public bool RetrieveVehicle(string licensePlate)
         //{
